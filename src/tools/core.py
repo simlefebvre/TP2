@@ -207,19 +207,19 @@ def connexion(id,mdp,conn):
 
     r = cur.fetchall()
     if len(r) == 0:
-        print("utilisateur inconu : identifiant incorect")
-        return 
+        #print("utilisateur inconu : identifiant incorect")
+        return False
     else:
         sel,iteration = r[0]
         hash = PBKDF(mdp,iteration,sel)
         cur.execute("select * from user where mdp = ? and id = ?",(hash,id))
         r = cur.fetchall()
         if len(r) != 1:
-            print("erreur mdp incorect")
-            return 
+            #print("erreur mdp incorect")
+            return False
         else:
-            print("utilisateur connecter")
-            return 
+            #print("utilisateur connecté")
+            return True
         
 
 def connexionSQL():

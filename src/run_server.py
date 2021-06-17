@@ -11,6 +11,7 @@ Modified on April 2021
 
 from flask import Flask, render_template, request
 import build
+import tools.core
 from socket import *
 
 #Récupération de l'adresse IP locale de l'odinateur et génération lien pour controler identifiant et mot de passe
@@ -23,7 +24,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def get_secret_message():
-    #return SECRET_MESSAGE
     return render_template("index.html", IP=ip)
 
 
@@ -32,7 +32,7 @@ def controler():
   result = request.form
   id = result['id']
   mdp = result['mdp']
-  if(mdp == "kilo"): #TODO COntroler MDP et ID
+  if(tools.core.connexion(id,mdp,tools.core.connexionSQL())):
     #MDP valide
     return render_template("afficherMDP.html", mdp=SECRET_MESSAGE)
   else:
