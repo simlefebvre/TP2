@@ -1,0 +1,41 @@
+/*-------------------------Contenu page-------------------------*/
+body
+{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column; 
+}
+
+.formulaire {
+    margin-top: 10px;
+    flex: 1;
+    text-align: center;
+}
+
+
+
+/*-------------------------Police-------------------------*/
+@font-face{
+    font-family: 'Berlin Sans FB Demi';
+    src: url('police/BRLNSDB.ttf') format('ttf'),
+}
+
+
+h1{
+    font-family: 'Cooper Black';
+    font-size: 2em;
+}
+
+label{
+    font-family: Verdana;
+}
+
+p {
+    font-size: 1.5em;
+}
+
+
+.erreur {
+    color:red;
+    font-size: 1.5em;
+}

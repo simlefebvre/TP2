@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Erreur de connexion</title>
+        <link rel="StyleSheet" href="{{ url_for('static',filename='styles/template.css') }}">
+    </head>
+    <body>
+
+        <div class="formulaire">
+            <p class="erreur">Erreur, mot de passe ou identifiant erroné !</p>
+
+            <h1>Connexion</h1>
+
+
+            <form method="post" action={{IP}}>
+                <label>Identifiant</label> : <input type="text" name="id" autofocus required/>
+                <br>
+                <label>Mot de passe</label> : <input type="password" name="mdp" required/>
+                <br><br>
+                <input type="submit" value="Envoyer" />
+            </form>
+
+        </div>
+    </body>
+</html>

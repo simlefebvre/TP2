@@ -9,11 +9,14 @@ Modified on April 2021
 
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+import build
+from socket import *
+
+#Récupération de l'adresse IP locale de l'odinateur et génération lien pour controler identifiant et mot de passe
+ip = "https://"+ gethostbyname(gethostname()) + ":8081/controler"
 
 # définir le message secret
-import build
-
 SECRET_MESSAGE = "arbre" # A modifier
 app = Flask(__name__)
 
@@ -21,12 +24,26 @@ app = Flask(__name__)
 @app.route("/")
 def get_secret_message():
     #return SECRET_MESSAGE
-    return render_template("connexion.html")
+    return render_template("index.html", IP=ip)
+
+
+@app.route('/controler',methods = ['POST'])
+def controler():
+  result = request.form
+  id = result['id']
+  mdp = result['mdp']
+  if(mdp == "kilo"): #TODO COntroler MDP et ID
+    #MDP valide
+    return render_template("afficherMDP.html", mdp=SECRET_MESSAGE)
+  else:
+    #MDP non valide
+    return render_template("erreurMDP.html", IP=ip)
 
 
 
 if __name__ == "__main__":
     # HTTP version
-    app.run(debug=True, host="0.0.0.0", port=8081)
+    #app.run(debug=True, host="0.0.0.0", port=8081)
     # HTTPS version
-    #app.run(debug=True, host="0.0.0.0", port=8081,ssl_context=(build.SERVER_PUBLIC_KEY_FILENAME, build.SERVER_PRIVATE_KEY_FILENAME))
+    app.run(debug=True, host="0.0.0.0", port=8081,ssl_context=(build.SERVER_PUBLIC_KEY_FILENAME, build.SERVER_PRIVATE_KEY_FILENAME))
+
