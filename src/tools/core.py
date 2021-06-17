@@ -58,7 +58,7 @@ def read_configuration(config: Configuration):
 def generate_private_key(filename: str, password: str):
     # 65537 est l'exposant public magique
     private_key = rsa.generate_private_key(
-        public_exponent=65537, key_size=2048, backend=default_backend()
+        public_exponent=65537, key_size=8192, backend=default_backend()
     )
 
     # Paramètres d'encodage pour le chiffrement de la clé privée
