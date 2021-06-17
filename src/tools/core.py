@@ -183,10 +183,11 @@ def sign_csr(csr, ca_public_key, ca_private_key, filename: str):
 
 def PBKDF(password, iteration, sel):
     password = password + str(sel) + str(iteration)
-    HMAC = hashlib.sha256(password).hexdigest()
+    HMAC = hashlib.sha256(password.encode(encoding='UTF-8',errors='strict')).hexdigest()
     for index in range(iteration):
         newpassword = password + HMAC
-        HMAC = xor(hashlib.sha256(newpassword).hexdigest(),HMAC)
+        HMAC = xor_two_str(hashlib.sha256(newpassword.encode(encoding='UTF-8',errors='strict')).hexdigest(),HMAC)
+    print("hmac fait !")
     return HMAC
 
 def inscription(mdp, identifiant, iteration,sel,connexion):
@@ -196,26 +197,40 @@ def inscription(mdp, identifiant, iteration,sel,connexion):
 
     connexion.cursor().execute(sql,info)
     connexion.commit()
+    print("inscription faite !")
 
 def connexion(id,mdp,conn):
     sql = "select sel, iteration from user where id = ?"
-    info = (id)
+    info = (id,)
     cur = conn.cursor()
     cur.execute(sql,info)
 
     r = cur.fetchall()
     if len(r) == 0:
-        return "utilisateur inconu : identifiant incorect"
+        print("utilisateur inconu : identifiant incorect")
+        return 
     else:
         sel,iteration = r[0]
         hash = PBKDF(mdp,iteration,sel)
         cur.execute("select * from user where mdp = ? and id = ?",(hash,id))
         r = cur.fetchall()
         if len(r) != 1:
-            return "erreur mdp incorect"
+            print("erreur mdp incorect")
+            return 
         else:
-            return "utilisateur connecter"
+            print("utilisateur connecter")
+            return 
         
 
 def connexionSQL():
     return sqlite3.connect("DataBase/Database.db")
+
+def xor_two_str(a,b):
+    xored = []
+    for i in range(max(len(a), len(b))):
+        xored_value = ord(a[i%len(a)]) ^ ord(b[i%len(b)])
+        xored.append(hex(xored_value)[2:])
+    return ''.join(xored)
+
+conn = connexionSQL()
+connexion("azerty","azerty",conn)
