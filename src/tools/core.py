@@ -231,6 +231,3 @@ def xor_two_str(a,b):
         xored_value = ord(a[i%len(a)]) ^ ord(b[i%len(b)])
         xored.append(hex(xored_value)[2:])
     return ''.join(xored)
-
-conn = connexionSQL()
-connexion("azerty","azerty",conn)
