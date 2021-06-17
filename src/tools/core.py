@@ -20,6 +20,10 @@ from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes
 
+# Librairie pour le stoquage des mots de passe
+import hashlib
+from operator import xor
+import sqlite3
 
 # Classe de définition d'une configuration
 class Configuration:
@@ -175,3 +179,43 @@ def sign_csr(csr, ca_public_key, ca_private_key, filename: str):
     with open(filename, "wb") as keyfile:
         # FIXME Expected type 'Encoding', got 'str' instead
         keyfile.write(public_key.public_bytes(serialization.Encoding.PEM))
+
+
+def PBKDF(password, iteration, sel):
+    password = password + str(sel) + str(iteration)
+    HMAC = hashlib.sha256(password).hexdigest()
+    for index in range(iteration):
+        newpassword = password + HMAC
+        HMAC = xor(hashlib.sha256(newpassword).hexdigest(),HMAC)
+    return HMAC
+
+def inscription(mdp, identifiant, iteration,sel,connexion):
+    sql = "insert into user values (?,?,?,?)"
+    hash = PBKDF(mdp,iteration,sel)
+    info = (identifiant,hash,sel,iteration)
+
+    connexion.cursor().execute(sql,info)
+    connexion.commit()
+
+def connexion(id,mdp,conn):
+    sql = "select sel, iteration from user where id = ?"
+    info = (id)
+    cur = conn.cursor()
+    cur.execute(sql,info)
+
+    r = cur.fetchall()
+    if len(r) == 0:
+        return "utilisateur inconu : identifiant incorect"
+    else:
+        sel,iteration = r[0]
+        hash = PBKDF(mdp,iteration,sel)
+        cur.execute("select * from user where mdp = ? and id = ?",(hash,id))
+        r = cur.fetchall()
+        if len(r) != 1:
+            return "erreur mdp incorect"
+        else:
+            return "utilisateur connecter"
+        
+
+def connexionSQL():
+    return sqlite3.connect("DataBase/Database.db")
