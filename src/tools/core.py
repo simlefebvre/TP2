@@ -25,6 +25,9 @@ import hashlib
 from operator import xor
 import sqlite3
 
+import variable
+import secrets
+
 # Classe de définition d'une configuration
 class Configuration:
 
@@ -62,8 +65,10 @@ def read_configuration(config: Configuration):
 def generate_private_key(filename: str, password: str):
     # 65537 est l'exposant public magique
     private_key = rsa.generate_private_key(
-        public_exponent=65537, key_size=2048, backend=default_backend()
+        public_exponent=65537, key_size=8192, backend=default_backend()
     )
+
+    #private_key = 
 
     # Paramètres d'encodage pour le chiffrement de la clé privée
     utf8_pass = password.encode("utf-8")
@@ -199,27 +204,38 @@ def inscription(mdp, identifiant, iteration,sel,connexion):
     connexion.commit()
     print("inscription faite !")
 
+
+
 def connexion(id,mdp,conn):
     sql = "select sel, iteration from user where id = ?"
     info = (id,)
     cur = conn.cursor()
     cur.execute(sql,info)
 
+    if variable.block:
+        if datetime.utcnow() - variable.dateBlock > timedelta(minutes=1):
+            variable.block = False
+            variable.compteur = 0
+
     r = cur.fetchall()
     if len(r) == 0:
-        #print("utilisateur inconu : identifiant incorect")
-        return False
+        return 0
+    if variable.block:
+        return 2
     else:
         sel,iteration = r[0]
         hash = PBKDF(mdp,iteration,sel)
         cur.execute("select * from user where mdp = ? and id = ?",(hash,id))
         r = cur.fetchall()
         if len(r) != 1:
-            #print("erreur mdp incorect")
+            variable.compteur = variable.compteur+1
+
+            if variable.compteur >3:
+                variable.block = True
+                variable.dateBlock = datetime.utcnow()
             return False
         else:
-            #print("utilisateur connecté")
-            return True
+           return True
         
 
 def connexionSQL():
@@ -231,3 +247,8 @@ def xor_two_str(a,b):
         xored_value = ord(a[i%len(a)]) ^ ord(b[i%len(b)])
         xored.append(hex(xored_value)[2:])
     return ''.join(xored)
+
+def reloadCaptchat():
+    variable.cap = str(secrets.randbelow(99999))
+    data = variable.image.generate(variable.cap)
+    variable.image.write(variable.cap,'static/captcha.png')

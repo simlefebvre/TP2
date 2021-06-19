@@ -8,7 +8,7 @@
     <body>
 
         <div class="formulaire">
-            <p class="erreur">Erreur, mot de passe ou identifiant erroné !</p>
+            <p class="erreur">Veuillez vérifiez la valeur du captcha</p>
 
             <h1>Connexion</h1>
 
@@ -21,8 +21,7 @@
                 <img src="{{ url_for('static',filename='captcha.png') }}" alt="captcha">
                 <br>
                 <label>Entrez le texte ci-dessus</label> : <input type="text" name = "captcha" required>
-                <br><br>
-                <input type="submit" value="Envoyer" />
+                <br><br><input type="submit" value="Envoyer" />
             </form>
 
         </div>
