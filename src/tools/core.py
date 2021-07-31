@@ -219,6 +219,7 @@ def connexion(id,mdp,conn):
 
     r = cur.fetchall()
     if len(r) == 0:
+        variable.compteur = variable.compteur +1
         return 0
     if variable.block:
         return 2
